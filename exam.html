@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Web Development Fundamentals Exam - Coffee Shop Theme</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(
+          135deg,
+          #6b4e3d 0%,
+          #8b4513 50%,
+          #a0522d 100%
+        );
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .exam-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 0;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .exam-header {
+        background: linear-gradient(45deg, #2c1810, #4a2c2a);
+        color: white;
+        padding: 40px;
+        text-align: center;
+        position: relative;
+      }
+
+      .exam-header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="80" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="60" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="70" cy="30" r="1.5" fill="rgba(255,255,255,0.1)"/></svg>');
+      }
+
+      .exam-title {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .exam-subtitle {
+        font-size: 1.2em;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+      }
+
+      .coffee-icon {
+        font-size: 3em;
+        margin-bottom: 20px;
+        color: #d2691e;
+      }
+
+      .exam-info {
+        background: #f8f9fa;
+        padding: 30px;
+        border-bottom: 3px solid #d2691e;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+      }
+
+      .info-card {
+        background: white;
+        padding: 20px;
+        border-radius: 0;
+        border-left: 4px solid #8b4513;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .info-card h3 {
+        color: #2c1810;
+        margin-bottom: 10px;
+        font-size: 1.1em;
+      }
+
+      .info-card p {
+        color: #666;
+        line-height: 1.6;
+      }
+
+      .section {
+        padding: 40px;
+        border-bottom: 2px solid #f0f0f0;
+      }
+
+      .section:last-child {
+        border-bottom: none;
+      }
+
+      .section-header {
+        background: linear-gradient(45deg, #8b4513, #d2691e);
+        color: white;
+        padding: 20px;
+        border-radius: 0;
+        margin-bottom: 30px;
+        text-align: center;
+      }
+
+      .section-title {
+        font-size: 1.8em;
+        margin-bottom: 5px;
+      }
+
+      .section-marks {
+        font-size: 1.1em;
+        opacity: 0.9;
+      }
+
+      .question {
+        background: white;
+        margin-bottom: 25px;
+        padding: 25px;
+        border-radius: 0;
+        border-left: 5px solid #d2691e;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+
+      .question:hover {
+        transform: translateY(-2px);
+      }
+
+      .question-number {
+        background: #8b4513;
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        margin-right: 15px;
+      }
+
+      .question-text {
+        font-size: 1.1em;
+        margin-bottom: 15px;
+        color: #333;
+        line-height: 1.6;
+      }
+
+      .options {
+        list-style: none;
+      }
+
+      .option {
+        margin-bottom: 10px;
+        padding: 12px;
+        background: #f8f9fa;
+        border-radius: 0;
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .option:hover {
+        background: #e9ecef;
+        border-color: #d2691e;
+      }
+
+      .option input[type="radio"] {
+        margin-right: 10px;
+      }
+
+      .option {
+        position: relative;
+        counter-increment: option-counter;
+      }
+
+      .option::before {
+        content: counter(option-counter, upper-alpha) ". ";
+        font-weight: 600;
+        color: #8b4513;
+        margin-right: 8px;
+      }
+
+      .question {
+        counter-reset: option-counter;
+      }
+
+      .code-block {
+        background: #2d3748;
+        color: #e2e8f0;
+        padding: 20px;
+        border-radius: 0;
+        font-family: "Courier New", monospace;
+        margin: 15px 0;
+        overflow-x: auto;
+      }
+
+      .answer-space {
+        border: 2px dashed #d2691e;
+        padding: 20px;
+        margin: 15px 0;
+        border-radius: 0;
+        background: #fafafa;
+        min-height: 100px;
+      }
+
+      .practical-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        padding: 30px;
+        margin-top: 20px;
+      }
+
+      .requirements {
+        background: white;
+        padding: 20px;
+        border-radius: 0;
+        margin: 20px 0;
+        border-left: 5px solid #28a745;
+      }
+
+      .requirements h4 {
+        color: #28a745;
+        margin-bottom: 15px;
+      }
+
+      .requirements ul {
+        padding-left: 20px;
+      }
+
+      .requirements li {
+        margin-bottom: 8px;
+        line-height: 1.6;
+      }
+
+      .timer {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #2c1810;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 0;
+        font-weight: 600;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+      }
+
+      .submit-section {
+        background: #2c1810;
+        color: white;
+        padding: 40px;
+        text-align: center;
+      }
+
+      .submit-btn {
+        background: linear-gradient(45deg, #d2691e, #ff8c00);
+        color: white;
+        padding: 15px 40px;
+        border: none;
+        border-radius: 25px;
+        font-size: 1.2em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+      }
+
+      .submit-btn:hover {
+        transform: scale(1.05);
+      }
+
+      @media print {
+        .timer {
+          display: none;
+        }
+
+        .exam-container {
+          box-shadow: none;
+          margin: 0;
+        }
+
+        .section {
+          page-break-inside: avoid;
+        }
+
+        .question {
+          page-break-inside: avoid;
+          margin-bottom: 20px;
+        }
+
+        .option::before {
+          color: #000 !important;
+          font-weight: bold;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .exam-container {
+          margin: 10px;
+        }
+
+        .section {
+          padding: 20px;
+        }
+
+        .exam-header {
+          padding: 20px;
+        }
+
+        .exam-title {
+          font-size: 2em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="timer">
+      <i class="fas fa-clock"></i> Time: <span id="timer">02:00:00</span>
+    </div>
+
+    <div class="exam-container">
+      <!-- Header -->
+      <div class="exam-header">
+        <div class="coffee-icon">
+          <i class="fas fa-coffee"></i>
+        </div>
+        <h1 class="exam-title">Web Development Fundamentals Exam</h1>
+        <p class="exam-subtitle">Coffee Shop Website Development Assessment</p>
+      </div>
+
+      <!-- Exam Information -->
+      <div class="exam-info">
+        <div class="info-grid">
+          <div class="info-card">
+            <h3><i class="fas fa-user"></i> Student Information</h3>
+            <p>
+              <strong>Name:</strong>
+              <input
+                type="text"
+                placeholder="Enter your name"
+                style="
+                  border: 1px solid #ccc;
+                  padding: 5px;
+                  margin-left: 10px;
+                  border-radius: 3px;
+                  width: 200px;
+                "
+              />
+            </p>
+            <p><strong>Date:</strong> July 28, 2025</p>
+            <p><strong>Duration:</strong> 2 Hours</p>
+          </div>
+          <div class="info-card">
+            <h3><i class="fas fa-list"></i> Exam Structure</h3>
+            <p><strong>Section 1:</strong> MCQ (20 marks)</p>
+            <p><strong>Section 2:</strong> Structural (20 marks)</p>
+            <p><strong>Section 3:</strong> Practical (10 marks)</p>
+          </div>
+          <div class="info-card">
+            <h3><i class="fas fa-exclamation-triangle"></i> Instructions</h3>
+            <p>• Read all questions carefully</p>
+            <p>• Answer all sections</p>
+            <p>• Total marks: 50</p>
+            <p>• No external resources allowed</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 1: Multiple Choice Questions -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">Section 1: Multiple Choice Questions</h2>
+          <p class="section-marks">20 Questions × 1 Mark = 20 Marks</p>
+        </div>
+
+        <div class="question">
+          <span class="question-number">1</span>
+          <div class="question-text">What does HTML stand for?</div>
+          <ul class="options">
+            <li class="option">
+              <input type="radio" name="q1" value="a" /> Hyper Text Markup
+              Language
+            </li>
+            <li class="option">
+              <input type="radio" name="q1" value="b" /> High Tech Modern
+              Language
+            </li>
+            <li class="option">
+              <input type="radio" name="q1" value="c" /> Home Tool Markup
+              Language
+            </li>
+            <li class="option">
+              <input type="radio" name="q1" value="d" /> Hyperlink and Text
+              Markup Language
+            </li>
+          </ul>
+        </div>
+
+        <div class="question">
+          <span class="question-number">2</span>
+          <div class="question-text">
+            Which CSS property is used to change the background color of an
+            element?
+          </div>
+          <ul class="options">
+            <li class="option">
+              <input type="radio" name="q2" value="a" /> color
+            </li>
+            <li class="option">
+              <input type="radio" name="q2" value="b" /> background-color
+            </li>
+            <li class="option">
+              <input type="radio" name="q2" value="c" /> bg-color
+            </li>
+            <li class="option">
+              <input type="radio" name="q2" value="d" /> background
+            </li>
+          </ul>
+        </div>
+
+        <div class="question">
+          <span class="question-number">3</span>
+          <div class="question-text">
+            Which HTML tag is used for creating a coffee shop's navigation menu?
+          </div>
+          <ul class="options">
+            <li class="option">
+              <input type="radio" name="q3" value="a" /> &lt;menu&gt;
+            </li>
+            <li class="option">
+              <input type="radio" name="q3" value="b" /> &lt;nav&gt;
+            </li>
+            <li class="option">
+              <input type="radio" name="q3" value="c" /> &lt;navigation&gt;
+            </li>
+            <li class="option">
+              <input type="radio" name="q3" value="d" /> &lt;list&gt;
+            </li>
+          </ul>
+        </div>
+
+        <div class="question">
+          <span class="question-number">4</span>
+          <div class="question-text">
+            What is the correct CSS syntax to make all paragraph text brown
+            (coffee color)?
+          </div>
+          <ul class="options">
+            <li class="option">
+              <input type="radio" name="q4" value="a" /> p {color: brown;}
+            </li>
+            <li class="option">
+              <input type="radio" name="q4" value="b" /> &lt;p style="color:
+              brown"&gt;
+            </li>
+            <li class="option">
+              <input type="radio" name="q4" value="c" /> p.color = brown;
+            </li>
+            <li class="option">
+              <input type="radio" name="q4" value="d" /> {p: color-brown;}
+            </li>
+          </ul>
+        </div>
+
+        <div class="question">
+          <span class="question-number">5</span>
+          <div class="question-text">
+            Which attribute specifies the URL of a coffee shop's logo image?
+          </div>
+          <ul class="options">
+            <li class="option">
+              <input type="radio" name="q5" value="a" /> href
+            </li>
+            <li class="option">
+              <input type="radio" name="q5" value="b" /> src
+            </li>
+            <li class="option">
+              <input type="radio" name="q5" value="c" /> link
+            </li>
+            <li class="option">
+              <input type="radio" name="q5" value="d" /> url
+            </li>
+          </ul>
+        </div>
+
+        <div class="question">
+          <span class="question-number">6</span>
+          <div class="question-text">What does CSS stand for?</div>
+          <ul class="options">
+            <li class="option">
+              <input type="radio" name="q6" value="a" /> Computer Style Sheets
+            </li>
+            <li class="option">
+              <input type="radio" name="q6" value="b" /> Creative Style Sheets
+            </li>
+            <li class="option">
+              <input type="radio" name="q6" value="c" /> Cascading Style Sheets
+            </li>
+            <li class="option">
+              <input type="radio" name="q6" value="d" /> Colorful Style Sheets
+            </li>
+          </ul>
+        </div>
+
+        <div class="question">
+          <span class="question-number">7</span>
+          <div class="question-text">
+            Which HTML element is used for the largest heading on a coffee shop
+            homepage?
+          </div>
+          <ul class="options">
+            <li class="option">
+              <input type="radio" name="q7" value="a" /> &lt;h6&gt;
+            </li>
+            <li class="option">
+              <input type="radio" name="q7" value="b" /> &lt;heading&gt;
+            </li>
+            <li class="option">
+              <input type="radio" name="q7" value="c" /> &lt;h1&gt;
+            </li>
+            <li class="option">
+              <input type="radio" name="q7" value="d" /> &lt;header&gt;
+            </li>
+          </ul>
+        </div>
+
+        <div class="question">
+          <span class="question-number">8</span>
+          <div class="question-text">How do you add a comment in CSS?</div>
+          <ul class="options">
+            <li class="option">
+              <input type="radio" name="q8" value="a" /> // this is a comment
+            </li>
+            <li class="option">
+              <input type="radio" name="q8" value="b" /> /* this is a comment */
+            </li>
+            <li class="option">
+              <input type="radio" name="q8" value="c" /> &lt;!-- this is a
+              comment --&gt;
+            </li>
+            <li class="option">
+              <input type="radio" name="q8" value="d" /> # this is a comment
+            </li>
+          </ul>
+        </div>
+
+        <div class="question">
+          <span class="question-number">9</span>
+          <div class="question-text">
+            Which CSS property controls the text size in a coffee menu?
+          </div>
+          <ul class="options">
+            <li class="option">
+              <input type="radio" name="q9" value="a" /> text-size
+            </li>
+            <li class="option">
+              <input type="radio" name="q9" value="b" /> font-size
+            </li>
+            <li class="option">
+              <input type="radio" name="q9" value="c" /> text-style
+            </li>
+            <li class="option">
+              <input type="radio" name="q9" value="d" /> font-style
+            </li>
+          </ul>
+        </div>
+
+        <div class="question">
+          <span class="question-number">10</span>
+          <div class="question-text">
+            What is the correct HTML for creating a hyperlink to a coffee shop's
+            contact page?
+          </div>
+          <ul class="options">
+            <li class="option">
+              <input type="radio" name="q10" value="a" /> &lt;a
+              url="contact.html"&gt;Contact&lt;/a&gt;
+            </li>
+            <li class="option">
+              <input type="radio" name="q10" value="b" /> &lt;a
+              href="contact.html"&gt;Contact&lt;/a&gt;
+            </li>
+            <li class="option">
+              <input type="radio" name="q10" value="c" /> &lt;a
+              link="contact.html"&gt;Contact&lt;/a&gt;
+            </li>
+            <li class="option">
+              <input type="radio" name="q10" value="d" />
+              &lt;a&gt;contact.html&lt;/a&gt;
+            </li>
+          </ul>
+        </div>
+
+        <div class="question">
+          <span class="question-number">11</span>
+          <div class="question-text">
+            Which HTML attribute is used to define inline styles for a coffee
+            shop element?
+          </div>
+          <ul class="options">
+            <li class="option">
+              <input type="radio" name="q11" value="a" /> class
+            </li>
+            <li class="option">
+              <input type="radio" name="q11" value="b" /> style
+            </li>
+            <li class="option">
+              <input type="radio" name="q11" value="c" /> styles
+            </li>
+            <li class="option">
+              <input type="radio" name="q11" value="d" /> font
+            </li>
+          </ul>
+        </div>
+
+        <div class="question">
+          <span class="question-number">12</span>
+          <div class="question-text">
+            How do you make a list item in a coffee menu without bullets?
+          </div>
+          <ul class="options">
+            <li class="option">
+              <input type="radio" name="q12" value="a" /> list-style-type: none;
+            </li>
+            <li class="option">
+              <input type="radio" name="q12" value="b" /> list-style:
+              no-bullets;
+            </li>
+            <li class="option">
+              <input type="radio" name="q12" value="c" /> list: none;
+            </li>
+            <li class="option">
+              <input type="radio" name="q12" value="d" /> bullet-style: none;
+            </li>
+          </ul>
+        </div>
+
+        <div class="question">
+          <span class="question-number">13</span>
+          <div class="question-text">
+            Which CSS property is used to add space around content inside a
+            coffee card?
+          </div>
+          <ul class="options">
+            <li class="option">
+              <input type="radio" name="q13" value="a" /> margin
+            </li>
+            <li class="option">
+              <input type="radio" name="q13" value="b" /> padding
+            </li>
+            <li class="option">
+              <input type="radio" name="q13" value="c" /> border
+            </li>
+            <li class="option">
+              <input type="radio" name="q13" value="d" /> spacing
+            </li>
+          </ul>
+        </div>
+
+        <div class="question">
+          <span class="question-number">14</span>
+          <div class="question-text">
+            What is the correct HTML for making a dropdown menu for coffee
+            types?
+          </div>
+          <ul class="options">
+            <li class="option">
+              <input type="radio" name="q14" value="a" /> &lt;input
+              type="dropdown"&gt;
+            </li>
+            <li class="option">
+              <input type="radio" name="q14" value="b" /> &lt;list&gt;
+            </li>
+            <li class="option">
+              <input type="radio" name="q14" value="c" /> &lt;select&gt;
+            </li>
+            <li class="option">
+              <input type="radio" name="q14" value="d" /> &lt;dropdown&gt;
+            </li>
+          </ul>
+        </div>
+
+        <div class="question">
+          <span class="question-number">15</span>
+          <div class="question-text">
+            How do you display "Costa Coffee" in the title bar of a browser?
+          </div>
+          <ul class="options">
+            <li class="option">
+              <input type="radio" name="q15" value="a" /> &lt;meta&gt;Costa
+              Coffee&lt;/meta&gt;
+            </li>
+            <li class="option">
+              <input type="radio" name="q15" value="b" /> &lt;title&gt;Costa
+              Coffee&lt;/title&gt;
+            </li>
+            <li class="option">
+              <input type="radio" name="q15" value="c" /> &lt;head&gt;Costa
+              Coffee&lt;/head&gt;
+            </li>
+            <li class="option">
+              <input type="radio" name="q15" value="d" /> &lt;header&gt;Costa
+              Coffee&lt;/header&gt;
+            </li>
+          </ul>
+        </div>
+
+        <div class="question">
+          <span class="question-number">16</span>
+          <div class="question-text">
+            Which CSS property can make a coffee shop image responsive?
+          </div>
+          <ul class="options">
+            <li class="option">
+              <input type="radio" name="q16" value="a" /> width: 100%;
+            </li>
+            <li class="option">
+              <input type="radio" name="q16" value="b" /> max-width: 100%;
+            </li>
+            <li class="option">
+              <input type="radio" name="q16" value="c" /> responsive: true;
+            </li>
+            <li class="option">
+              <input type="radio" name="q16" value="d" /> image-responsive:
+              auto;
+            </li>
+          </ul>
+        </div>
+
+        <div class="question">
+          <span class="question-number">17</span>
+          <div class="question-text">
+            What is the correct way to link an external CSS file for a coffee
+            shop website?
+          </div>
+          <ul class="options">
+            <li class="option">
+              <input type="radio" name="q17" value="a" /> &lt;link
+              rel="stylesheet" href="style.css"&gt;
+            </li>
+            <li class="option">
+              <input type="radio" name="q17" value="b" />
+              &lt;css&gt;style.css&lt;/css&gt;
+            </li>
+            <li class="option">
+              <input type="radio" name="q17" value="c" /> &lt;style
+              src="style.css"&gt;
+            </li>
+            <li class="option">
+              <input type="radio" name="q17" value="d" /> &lt;link
+              css="style.css"&gt;
+            </li>
+          </ul>
+        </div>
+
+        <div class="question">
+          <span class="question-number">18</span>
+          <div class="question-text">
+            Which HTML element represents a section of a coffee shop webpage?
+          </div>
+          <ul class="options">
+            <li class="option">
+              <input type="radio" name="q18" value="a" /> &lt;section&gt;
+            </li>
+            <li class="option">
+              <input type="radio" name="q18" value="b" /> &lt;div&gt;
+            </li>
+            <li class="option">
+              <input type="radio" name="q18" value="c" /> &lt;part&gt;
+            </li>
+            <li class="option">
+              <input type="radio" name="q18" value="d" /> &lt;area&gt;
+            </li>
+          </ul>
+        </div>
+
+        <div class="question">
+          <span class="question-number">19</span>
+          <div class="question-text">
+            How do you center-align text in a coffee shop header using CSS?
+          </div>
+          <ul class="options">
+            <li class="option">
+              <input type="radio" name="q19" value="a" /> text-align: center;
+            </li>
+            <li class="option">
+              <input type="radio" name="q19" value="b" /> align: center;
+            </li>
+            <li class="option">
+              <input type="radio" name="q19" value="c" /> text-center: true;
+            </li>
+            <li class="option">
+              <input type="radio" name="q19" value="d" /> center-text: yes;
+            </li>
+          </ul>
+        </div>
+
+        <div class="question">
+          <span class="question-number">20</span>
+          <div class="question-text">
+            Which CSS property is used to change the font family in a coffee
+            menu?
+          </div>
+          <ul class="options">
+            <li class="option">
+              <input type="radio" name="q20" value="a" /> font-family
+            </li>
+            <li class="option">
+              <input type="radio" name="q20" value="b" /> font-style
+            </li>
+            <li class="option">
+              <input type="radio" name="q20" value="c" /> text-font
+            </li>
+            <li class="option">
+              <input type="radio" name="q20" value="d" /> font-type
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Section 2: Structural Questions -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">Section 2: Structural Questions</h2>
+          <p class="section-marks">20 Questions × 1 Mark = 20 Marks</p>
+        </div>
+
+        <div class="question">
+          <span class="question-number">1</span>
+          <div class="question-text">
+            Write the basic HTML5 structure for a coffee shop webpage. Include
+            DOCTYPE, html, head, and body tags.
+          </div>
+          <div class="answer-space">
+            <textarea
+              style="
+                width: 100%;
+                min-height: 150px;
+                border: none;
+                background: transparent;
+                resize: vertical;
+              "
+              placeholder="Write your HTML structure here..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="question">
+          <span class="question-number">2</span>
+          <div class="question-text">
+            Create a CSS rule that makes all coffee menu items
+            (class="menu-item") have a brown background color and white text.
+          </div>
+          <div class="answer-space">
+            <textarea
+              style="
+                width: 100%;
+                min-height: 100px;
+                border: none;
+                background: transparent;
+                resize: vertical;
+              "
+              placeholder="Write your CSS rule here..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="question">
+          <span class="question-number">3</span>
+          <div class="question-text">
+            Write HTML code to create a navigation menu for a coffee shop with
+            links to: Home, Menu, About, Contact.
+          </div>
+          <div class="answer-space">
+            <textarea
+              style="
+                width: 100%;
+                min-height: 120px;
+                border: none;
+                background: transparent;
+                resize: vertical;
+              "
+              placeholder="Write your HTML navigation code here..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="question">
+          <span class="question-number">4</span>
+          <div class="question-text">
+            What is wrong with this HTML code? Identify and explain the errors:
+            <div class="code-block">
+              &lt;html&gt; &lt;head&gt; &lt;title&gt;Coffee Shop &lt;/head&gt;
+              &lt;body&gt; &lt;h1&gt;Welcome to Our Coffee Shop&lt;h1&gt;
+              &lt;p&gt;Best coffee in town&lt;/p&gt; &lt;body&gt; &lt;/html&gt;
+            </div>
+          </div>
+          <div class="answer-space">
+            <textarea
+              style="
+                width: 100%;
+                min-height: 100px;
+                border: none;
+                background: transparent;
+                resize: vertical;
+              "
+              placeholder="List the errors and provide corrections..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="question">
+          <span class="question-number">5</span>
+          <div class="question-text">
+            Create an HTML form for coffee shop customer feedback with fields
+            for: Name, Email, Rating (1-5), and Comments.
+          </div>
+          <div class="answer-space">
+            <textarea
+              style="
+                width: 100%;
+                min-height: 150px;
+                border: none;
+                background: transparent;
+                resize: vertical;
+              "
+              placeholder="Write your HTML form code here..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="question">
+          <span class="question-number">6</span>
+          <div class="question-text">
+            Write CSS code to create a flexbox layout that displays three coffee
+            product cards side by side.
+          </div>
+          <div class="answer-space">
+            <textarea
+              style="
+                width: 100%;
+                min-height: 120px;
+                border: none;
+                background: transparent;
+                resize: vertical;
+              "
+              placeholder="Write your CSS flexbox code here..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="question">
+          <span class="question-number">7</span>
+          <div class="question-text">
+            Create an HTML table to display coffee shop menu items with columns:
+            Item Name, Price, and Description.
+          </div>
+          <div class="answer-space">
+            <textarea
+              style="
+                width: 100%;
+                min-height: 150px;
+                border: none;
+                background: transparent;
+                resize: vertical;
+              "
+              placeholder="Write your HTML table code here..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="question">
+          <span class="question-number">8</span>
+          <div class="question-text">
+            Explain the difference between margin and padding in CSS. Provide an
+            example for each.
+          </div>
+          <div class="answer-space">
+            <textarea
+              style="
+                width: 100%;
+                min-height: 120px;
+                border: none;
+                background: transparent;
+                resize: vertical;
+              "
+              placeholder="Explain the difference and provide examples..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="question">
+          <span class="question-number">9</span>
+          <div class="question-text">
+            Write HTML code to embed a coffee shop promotional video with
+            controls and autoplay disabled.
+          </div>
+          <div class="answer-space">
+            <textarea
+              style="
+                width: 100%;
+                min-height: 100px;
+                border: none;
+                background: transparent;
+                resize: vertical;
+              "
+              placeholder="Write your HTML video code here..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="question">
+          <span class="question-number">10</span>
+          <div class="question-text">
+            Create a CSS media query that changes the coffee shop logo size on
+            mobile devices (max-width: 768px).
+          </div>
+          <div class="answer-space">
+            <textarea
+              style="
+                width: 100%;
+                min-height: 100px;
+                border: none;
+                background: transparent;
+                resize: vertical;
+              "
+              placeholder="Write your CSS media query here..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="question">
+          <span class="question-number">11</span>
+          <div class="question-text">
+            List and explain three different ways to apply CSS styles to HTML
+            elements.
+          </div>
+          <div class="answer-space">
+            <textarea
+              style="
+                width: 100%;
+                min-height: 120px;
+                border: none;
+                background: transparent;
+                resize: vertical;
+              "
+              placeholder="List and explain the three methods..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="question">
+          <span class="question-number">12</span>
+          <div class="question-text">
+            Write HTML code to create an image gallery for coffee shop photos
+            using the &lt;figure&gt; and &lt;figcaption&gt; elements.
+          </div>
+          <div class="answer-space">
+            <textarea
+              style="
+                width: 100%;
+                min-height: 120px;
+                border: none;
+                background: transparent;
+                resize: vertical;
+              "
+              placeholder="Write your HTML image gallery code here..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="question">
+          <span class="question-number">13</span>
+          <div class="question-text">
+            Create CSS code to style a coffee shop button with hover effects
+            (change background color and scale).
+          </div>
+          <div class="answer-space">
+            <textarea
+              style="
+                width: 100%;
+                min-height: 120px;
+                border: none;
+                background: transparent;
+                resize: vertical;
+              "
+              placeholder="Write your CSS button styling code here..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="question">
+          <span class="question-number">14</span>
+          <div class="question-text">
+            Explain what semantic HTML is and provide three examples of semantic
+            elements suitable for a coffee shop website.
+          </div>
+          <div class="answer-space">
+            <textarea
+              style="
+                width: 100%;
+                min-height: 120px;
+                border: none;
+                background: transparent;
+                resize: vertical;
+              "
+              placeholder="Explain semantic HTML and provide examples..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="question">
+          <span class="question-number">15</span>
+          <div class="question-text">
+            Write HTML code to create a contact information section for a coffee
+            shop using appropriate semantic elements.
+          </div>
+          <div class="answer-space">
+            <textarea
+              style="
+                width: 100%;
+                min-height: 120px;
+                border: none;
+                background: transparent;
+                resize: vertical;
+              "
+              placeholder="Write your HTML contact section here..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="question">
+          <span class="question-number">16</span>
+          <div class="question-text">
+            Create CSS Grid layout code to arrange coffee shop content in a
+            3-column layout with a header and footer.
+          </div>
+          <div class="answer-space">
+            <textarea
+              style="
+                width: 100%;
+                min-height: 150px;
+                border: none;
+                background: transparent;
+                resize: vertical;
+              "
+              placeholder="Write your CSS Grid code here..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="question">
+          <span class="question-number">17</span>
+          <div class="question-text">
+            What is the CSS Box Model? Draw a simple diagram and explain each
+            component.
+          </div>
+          <div class="answer-space">
+            <textarea
+              style="
+                width: 100%;
+                min-height: 150px;
+                border: none;
+                background: transparent;
+                resize: vertical;
+              "
+              placeholder="Explain the CSS Box Model and draw a diagram..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="question">
+          <span class="question-number">18</span>
+          <div class="question-text">
+            Write HTML and CSS code to create a responsive coffee shop card
+            component with image, title, description, and price.
+          </div>
+          <div class="answer-space">
+            <textarea
+              style="
+                width: 100%;
+                min-height: 180px;
+                border: none;
+                background: transparent;
+                resize: vertical;
+              "
+              placeholder="Write your HTML and CSS code here..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="question">
+          <span class="question-number">19</span>
+          <div class="question-text">
+            Explain the difference between absolute and relative positioning in
+            CSS. Provide examples.
+          </div>
+          <div class="answer-space">
+            <textarea
+              style="
+                width: 100%;
+                min-height: 120px;
+                border: none;
+                background: transparent;
+                resize: vertical;
+              "
+              placeholder="Explain positioning and provide examples..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="question">
+          <span class="question-number">20</span>
+          <div class="question-text">
+            Create HTML code for a coffee shop footer with social media links,
+            copyright information, and contact details.
+          </div>
+          <div class="answer-space">
+            <textarea
+              style="
+                width: 100%;
+                min-height: 150px;
+                border: none;
+                background: transparent;
+                resize: vertical;
+              "
+              placeholder="Write your HTML footer code here..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Practical Project -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">Section 3: Practical Project</h2>
+          <p class="section-marks">Portfolio Website Creation - 10 Marks</p>
+        </div>
+
+        <div class="practical-section">
+          <h3 style="color: #2c1810; margin-bottom: 20px">
+            Create a Personal Portfolio Website
+          </h3>
+
+          <div class="requirements">
+            <h4>Project Requirements (10 Marks Total)</h4>
+            <ul>
+              <li>
+                <strong>HTML Structure (3 marks):</strong> Proper HTML5 semantic
+                structure with header, main, sections, and footer
+              </li>
+              <li>
+                <strong>CSS Styling (3 marks):</strong> Professional styling
+                with colors, fonts, layout, and responsive design
+              </li>
+              <li>
+                <strong>Content Sections (2 marks):</strong> Include About,
+                Skills, Projects, and Contact sections
+              </li>
+              <li>
+                <strong>Navigation (1 mark):</strong> Working navigation menu
+                that links to different sections
+              </li>
+              <li>
+                <strong>Code Quality (1 mark):</strong> Clean, well-organized,
+                and commented code
+              </li>
+            </ul>
+          </div>
+
+          <div class="requirements">
+            <h4>Technical Specifications</h4>
+            <ul>
+              <li>
+                Use HTML5 semantic elements (header, nav, main, section, footer)
+              </li>
+              <li>Implement CSS Flexbox or Grid for layout</li>
+              <li>Include at least one CSS animation or transition</li>
+              <li>Make the website responsive (mobile-friendly)</li>
+              <li>Use external CSS file (not inline styles)</li>
+              <li>Include proper meta tags for SEO</li>
+            </ul>
+          </div>
+
+          <div class="requirements">
+            <h4>Content Guidelines</h4>
+            <ul>
+              <li>
+                <strong>Header:</strong> Your name and professional tagline
+              </li>
+              <li>
+                <strong>About Section:</strong> Brief introduction about
+                yourself
+              </li>
+              <li>
+                <strong>Skills Section:</strong> Display your web development
+                skills
+              </li>
+              <li>
+                <strong>Projects Section:</strong> Showcase 2-3 sample projects
+              </li>
+              <li>
+                <strong>Contact Section:</strong> Your contact information and
+                social links
+              </li>
+              <li><strong>Footer:</strong> Copyright information</li>
+            </ul>
+          </div>
+
+          <div
+            style="
+              background: #fff3cd;
+              border: 1px solid #ffeaa7;
+              padding: 15px;
+              border-radius: 0;
+              margin: 20px 0;
+            "
+          >
+            <h4 style="color: #856404; margin-bottom: 10px">
+              <i class="fas fa-clock"></i> Time Allocation
+            </h4>
+            <p style="color: #856404; margin: 0">
+              Recommended time for this section: 45-60 minutes
+            </p>
+          </div>
+
+          <div
+            style="
+              background: #d1ecf1;
+              border: 1px solid #bee5eb;
+              padding: 15px;
+              border-radius: 0;
+              margin: 20px 0;
+            "
+          >
+            <h4 style="color: #0c5460; margin-bottom: 10px">
+              <i class="fas fa-lightbulb"></i> Submission Instructions
+            </h4>
+            <p style="color: #0c5460; margin: 0">
+              Create your HTML and CSS files and submit them as a zip folder.
+              Include a screenshot of your website in the folder.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Section -->
+      <div class="submit-section">
+        <h3 style="margin-bottom: 20px">Ready to Submit?</h3>
+        <p style="margin-bottom: 30px; opacity: 0.9">
+          Double-check your answers before submitting. Make sure you've
+          completed all sections.
+        </p>
+        <button class="submit-btn">
+          <i class="fas fa-paper-plane"></i> Submit Exam
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // Timer functionality
+      let timeLeft = 7200; // 2 hours in seconds
+      let examStartTime = new Date();
+
+      function updateTimer() {
+        const hours = Math.floor(timeLeft / 3600);
+        const minutes = Math.floor((timeLeft % 3600) / 60);
+        const seconds = timeLeft % 60;
+
+        const timerDisplay = document.getElementById("timer");
+        timerDisplay.textContent = `${hours
+          .toString()
+          .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds
+          .toString()
+          .padStart(2, "0")}`;
+
+        if (timeLeft <= 0) {
+          alert("Time is up! Your exam will be automatically saved as PDF.");
+          generatePDF("Time Up - Auto Save");
+          return;
+        }
+
+        timeLeft--;
+      }
+
+      // PDF Generation Function
+      function generatePDF(saveReason) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Get student name
+        const studentName =
+          document.querySelector('input[type="text"]')?.value || "Student";
+        const currentDate = new Date().toLocaleDateString();
+        const currentTime = new Date().toLocaleTimeString();
+
+        // PDF Header
+        doc.setFontSize(20);
+        doc.text("Web Development Fundamentals Exam", 20, 20);
+        doc.setFontSize(12);
+        doc.text("Coffee Shop Website Development Assessment", 20, 30);
+
+        // Student Info
+        doc.text(`Student Name: ${studentName}`, 20, 45);
+        doc.text(`Date: ${currentDate}`, 20, 55);
+        doc.text(`Time: ${currentTime}`, 20, 65);
+        doc.text(`Save Reason: ${saveReason}`, 20, 75);
+        doc.text(`Exam Duration: ${formatTime(7200 - timeLeft)}`, 20, 85);
+
+        let yPosition = 100;
+
+        // Section 1: MCQ Answers
+        doc.setFontSize(16);
+        doc.text(
+          "Section 1: Multiple Choice Questions (20 marks)",
+          20,
+          yPosition
+        );
+        yPosition += 15;
+
+        doc.setFontSize(10);
+        for (let i = 1; i <= 20; i++) {
+          const selectedOption = document.querySelector(
+            `input[name="q${i}"]:checked`
+          );
+          const answer = selectedOption
+            ? selectedOption.value.toUpperCase()
+            : "Not Answered";
+          doc.text(`Q${i}: ${answer}`, 20, yPosition);
+          yPosition += 8;
+
+          if (yPosition > 270) {
+            doc.addPage();
+            yPosition = 20;
+          }
+        }
+
+        // Section 2: Structural Questions
+        yPosition += 10;
+        if (yPosition > 250) {
+          doc.addPage();
+          yPosition = 20;
+        }
+
+        doc.setFontSize(16);
+        doc.text("Section 2: Structural Questions (20 marks)", 20, yPosition);
+        yPosition += 15;
+
+        doc.setFontSize(10);
+        const textareas = document.querySelectorAll("textarea");
+        for (let i = 0; i < Math.min(textareas.length, 20); i++) {
+          const answer = textareas[i].value || "Not Answered";
+          doc.text(`Q${i + 1}:`, 20, yPosition);
+          yPosition += 8;
+
+          // Split long text into multiple lines
+          const lines = doc.splitTextToSize(answer, 170);
+          for (let line of lines.slice(0, 5)) {
+            // Limit to 5 lines per answer
+            doc.text(line, 25, yPosition);
+            yPosition += 6;
+
+            if (yPosition > 270) {
+              doc.addPage();
+              yPosition = 20;
+            }
+          }
+          yPosition += 5;
+        }
+
+        // Section 3: Practical Project Note
+        yPosition += 10;
+        if (yPosition > 250) {
+          doc.addPage();
+          yPosition = 20;
+        }
+
+        doc.setFontSize(16);
+        doc.text("Section 3: Practical Project (10 marks)", 20, yPosition);
+        yPosition += 15;
+        doc.setFontSize(10);
+        doc.text(
+          "Note: Practical project files should be submitted separately as requested.",
+          20,
+          yPosition
+        );
+
+        // Add footer
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+          doc.setPage(i);
+          doc.setFontSize(8);
+          doc.text(`Page ${i} of ${pageCount}`, 20, 290);
+          doc.text(
+            "Web Development Fundamentals Exam - Coffee Shop Theme",
+            120,
+            290
+          );
+        }
+
+        // Save the PDF
+        const fileName = `${studentName.replace(
+          /\s+/g,
+          "_"
+        )}_WebDev_Exam_${currentDate.replace(/\//g, "-")}.pdf`;
+        doc.save(fileName);
+
+        return fileName;
+      }
+
+      // Helper function to format time
+      function formatTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+        return `${hours.toString().padStart(2, "0")}:${minutes
+          .toString()
+          .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+      }
+
+      // Update timer every second
+      setInterval(updateTimer, 1000);
+
+      // Smooth scrolling for better UX
+      document.querySelectorAll(".option").forEach((option) => {
+        option.addEventListener("click", function () {
+          const radio = this.querySelector('input[type="radio"]');
+          radio.checked = true;
+        });
+      });
+
+      // Submit functionality
+      document
+        .querySelector(".submit-btn")
+        .addEventListener("click", function () {
+          if (
+            confirm(
+              "Are you sure you want to submit your exam? This will generate a PDF of your answers."
+            )
+          ) {
+            const fileName = generatePDF("Manual Submission");
+            alert(
+              `Exam submitted successfully! Your answers have been saved as: ${fileName}`
+            );
+          }
+        });
+
+      // Auto-save functionality (enhanced with periodic PDF backup)
+      let autoSaveCount = 0;
+      setInterval(() => {
+        const formData = new FormData();
+        document
+          .querySelectorAll('input[type="radio"]:checked')
+          .forEach((input) => {
+            formData.append(input.name, input.value);
+          });
+        document.querySelectorAll("textarea").forEach((textarea, index) => {
+          formData.append(`textarea_${index}`, textarea.value);
+        });
+
+        // Auto-save progress to localStorage
+        const examData = {
+          mcqAnswers: {},
+          structuralAnswers: [],
+          timestamp: new Date().toISOString(),
+          timeRemaining: timeLeft,
+        };
+
+        // Save MCQ answers
+        document
+          .querySelectorAll('input[type="radio"]:checked')
+          .forEach((input) => {
+            examData.mcqAnswers[input.name] = input.value;
+          });
+
+        // Save structural answers
+        document.querySelectorAll("textarea").forEach((textarea, index) => {
+          examData.structuralAnswers[index] = textarea.value;
+        });
+
+        localStorage.setItem("webDevExamProgress", JSON.stringify(examData));
+
+        // Create backup PDF every 30 minutes
+        autoSaveCount++;
+        if (autoSaveCount % 60 === 0) {
+          // Every 30 minutes (60 * 30 seconds)
+          generatePDF(`Auto Backup - ${Math.floor(autoSaveCount / 60)} of 4`);
+        }
+
+        console.log("Auto-saving exam progress...");
+      }, 30000); // Auto-save every 30 seconds
+
+      // Load saved progress on page load
+      window.addEventListener("load", function () {
+        const savedData = localStorage.getItem("webDevExamProgress");
+        if (
+          savedData &&
+          confirm("Found saved exam progress. Would you like to restore it?")
+        ) {
+          const examData = JSON.parse(savedData);
+
+          // Restore MCQ answers
+          Object.keys(examData.mcqAnswers).forEach((questionName) => {
+            const radio = document.querySelector(
+              `input[name="${questionName}"][value="${examData.mcqAnswers[questionName]}"]`
+            );
+            if (radio) radio.checked = true;
+          });
+
+          // Restore structural answers
+          const textareas = document.querySelectorAll("textarea");
+          examData.structuralAnswers.forEach((answer, index) => {
+            if (textareas[index]) textareas[index].value = answer || "";
+          });
+
+          // Restore time if applicable
+          if (examData.timeRemaining && examData.timeRemaining > 0) {
+            timeLeft = examData.timeRemaining;
+          }
+
+          alert("Previous exam progress has been restored!");
+        }
+      });
+
+      // Add manual save button functionality
+      function addManualSaveButton() {
+        const saveButton = document.createElement("button");
+        saveButton.innerHTML =
+          '<i class="fas fa-download"></i> Save Progress as PDF';
+        saveButton.style.cssText = `
+          position: fixed;
+          top: 80px;
+          right: 20px;
+          background: #28a745;
+          color: white;
+          padding: 10px 15px;
+          border: none;
+          border-radius: 0;
+          font-size: 12px;
+          cursor: pointer;
+          z-index: 1000;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        `;
+
+        saveButton.addEventListener("click", function () {
+          const fileName = generatePDF("Manual Progress Save");
+          alert(`Progress saved as: ${fileName}`);
+        });
+
+        document.body.appendChild(saveButton);
+      }
+
+      // Add the manual save button
+      addManualSaveButton();
+
+      // Warning before page unload
+      window.addEventListener("beforeunload", function (e) {
+        e.preventDefault();
+        e.returnValue =
+          "Are you sure you want to leave? Your exam progress might be lost.";
+      });
+    </script>
+  </body>
+</html>
